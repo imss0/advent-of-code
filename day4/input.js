@@ -1,11 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const filePath = path.join(__dirname, "input.txt");
+const testPath = path.join(__dirname, "testinput.txt");
 const input = fs.readFileSync(filePath).toString().trim().split("\n");
-
-// 오른쪽 숫자들이 내가 가진 것, 왼쪽 숫자들이 당첨 번호
-// 왼쪽 숫자들 = targett / 오른쪽 숫자들을 빙글빙글 돌며 왼쪽 숫자 target에 맞는 숫자가 있다면 count+ 한다
-// Math.pow(2, count - 1) = 점수!
+const testInput = fs.readFileSync(testPath).toString().trim().split("\n");
 
 function getScore(str) {
   let [targets, myNumbers] = str.split(":")[1].split("|");
@@ -25,8 +23,46 @@ function getScore(str) {
       }
     }
   }
-  if ((count === 0)) return 0;
-  else return (Math.pow(2, count - 1));
+  if (count === 0) return 0;
+  else return Math.pow(2, count - 1);
+}
+
+function getAmountOfCards(arr) {
+  const enriched = arr.map((str) => {
+    let cardId = Number(str.split(":")[0].split(" ")[1]);
+    let [targets, myNumbers] = str.split(":")[1].split("|");
+    const instances = [];
+    targets = targets
+      .split(" ")
+      .filter((item) => item)
+      .map((item) => Number(item));
+    myNumbers = myNumbers
+      .split(" ")
+      .filter((item) => item)
+      .map((item) => Number(item));
+    let count = 0;
+    for (let i = 0; i < targets.length; i++) {
+      for (let j = 0; j < myNumbers.length; j++) {
+        if (myNumbers[j] === targets[i]) {
+          count++;
+        }
+      }
+    }
+
+    for (let i = 0; i < count; i++) {
+      instances.push({
+        cardId: cardId + i + 1,
+        instances: [],
+      });
+    }
+
+    return {
+      cardId,
+      instances,
+    };
+  });
+
+  return enriched;
 }
 
 let res1 = 0;
@@ -35,4 +71,4 @@ input.forEach((item) => {
   res1 += getScore(item);
 });
 
-console.log(res1);
+console.log(getAmountOfCards(testInput));
