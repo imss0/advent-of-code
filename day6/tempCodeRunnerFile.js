@@ -1,2 +1,0 @@
-  // .split("    ")
-  // .map((item) => +item);
