@@ -17,7 +17,19 @@ const [
   lightToTemperatureMap,
   temperatureToHumidityMap,
   humidityToLocationMap,
-] = input.slice(1).map((item) => createMap(item));
+] = input.slice(1).map((str) => {
+  const lines = str
+    .split(":")[1]
+    .trim()
+    .split("\n")
+    .map((item) => item.split(" "));
+  const processed = lines.map((item) => ({
+    destinationRangeStart: +item[0],
+    sourceRangeStart: +item[1],
+    rangeLength: +item[2],
+  }));
+  return processed;
+});
 
 function connectSteps(seed, maps) {
   let result = seed;
@@ -33,40 +45,66 @@ function connectSteps(seed, maps) {
   return result;
 }
 
-const locations = seeds.map((item) => {
-  return connectSteps(
-    connectSteps(
+// function getMoreSeeds(seeds) {
+const locations = [];
+
+for (let i = 0; i < seeds.length; i += 2) {
+  const rangeStart = seeds[i];
+  const rangeLength = seeds[i + 1];
+
+  for (let j = 0; j < rangeLength; j++) {
+    const result = connectSteps(
       connectSteps(
         connectSteps(
           connectSteps(
             connectSteps(
-              connectSteps(item, seedToSoilMap),
-              soilToFertilizerMap
+              connectSteps(
+                connectSteps(rangeStart + j, seedToSoilMap),
+                soilToFertilizerMap
+              ),
+              fertilizerToWaterMap
             ),
-            fertilizerToWaterMap
+            waterToLightMap
           ),
-          waterToLightMap
+          lightToTemperatureMap
         ),
-        lightToTemperatureMap
+        temperatureToHumidityMap
       ),
-      temperatureToHumidityMap
-    ),
-    humidityToLocationMap
-  );
-});
+      humidityToLocationMap
+    );
+
+    locations.push([result]);
+  }
+}
+
+console.log(locations);
+
+//   return newSeeds;
+// }
+
+// const newSeeds = getMoreSeeds(seeds);
+// console.log(newSeeds);
+
+// const locations = newSeeds.map((item) => {
+//   return connectSteps(
+//     connectSteps(
+//       connectSteps(
+//         connectSteps(
+//           connectSteps(
+//             connectSteps(
+//               connectSteps(item, seedToSoilMap),
+//               soilToFertilizerMap
+//             ),
+//             fertilizerToWaterMap
+//           ),
+//           waterToLightMap
+//         ),
+//         lightToTemperatureMap
+//       ),
+//       temperatureToHumidityMap
+//     ),
+//     humidityToLocationMap
+//   );
+// });
 
 console.log(Math.min(...locations));
-
-function createMap(str) {
-  const lines = str
-    .split(":")[1]
-    .trim()
-    .split("\n")
-    .map((item) => item.split(" "));
-  const processed = lines.map((item) => ({
-    destinationRangeStart: +item[0],
-    sourceRangeStart: +item[1],
-    rangeLength: +item[2],
-  }));
-  return processed;
-}
