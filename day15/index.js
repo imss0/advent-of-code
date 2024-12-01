@@ -17,6 +17,6 @@ function getHashed(str) {
 
 const res = input
   .map((str) => getHashed(str))
-  .reduce((acc, curr) => acc + curr, 0);
+  // .reduce((acc, curr) => acc + curr, 0);
 
 console.log(res);
