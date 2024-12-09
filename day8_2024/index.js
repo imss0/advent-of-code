@@ -41,16 +41,28 @@ function markDistances(grid) {
         const dy = y2 - y1;
         const dx = x2 - x1;
 
-        const markY1 = y1 - dy;
-        const markX1 = x1 - dx;
-        if (markY1 >= 0 && markY1 < height && markX1 >= 0 && markX1 < width) {
-          result[markY1][markX1] = "#";
-        }
+        let multiplier = 1;
 
-        const markY2 = y2 + dy;
-        const markX2 = x2 + dx;
-        if (markY2 >= 0 && markY2 < height && markX2 >= 0 && markX2 < width) {
-          result[markY2][markX2] = "#";
+        while (true) {
+          let anyMarked = false;
+
+          const markY1 = y1 - dy * multiplier;
+          const markX1 = x1 - dx * multiplier;
+          if (markY1 >= 0 && markY1 < height && markX1 >= 0 && markX1 < width) {
+            result[markY1][markX1] = "#";
+            anyMarked = true;
+          }
+
+          const markY2 = y2 + dy * multiplier;
+          const markX2 = x2 + dx * multiplier;
+          if (markY2 >= 0 && markY2 < height && markX2 >= 0 && markX2 < width) {
+            result[markY2][markX2] = "#";
+            anyMarked = true;
+          }
+
+          if (!anyMarked) break;
+
+          multiplier++;
         }
       }
     }
@@ -61,9 +73,10 @@ function markDistances(grid) {
 
 const result = markDistances(arr);
 
+console.log(result);
+
 let cnt = 0;
 for (let i = 0; i < result.length; i++) {
-  console.log(result[i]);
   for (let j = 0; j < result[0].length; j++) {
     if (result[i][j] === "#") {
       cnt++;
