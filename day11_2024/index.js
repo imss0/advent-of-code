@@ -3,8 +3,6 @@ const path = require("path");
 const filePath = path.join(__dirname, "input.txt");
 const stones = fs.readFileSync(filePath).toString().split(" ");
 
-console.log(stones);
-
 function processStone(stone) {
   const processed = [];
   if (stone === "0") {
@@ -23,14 +21,57 @@ function processStone(stone) {
   return processed;
 }
 
-function processStoneIteratively(stones, iterations) {
+// const cache = new Map();
+
+// function processStoneWithCache(stone) {
+//   if (cache.has(stone)) return cache.get(stone);
+
+//   const result = processStone(stone);
+//   cache.set(stone, result);
+//   return result;
+// }
+
+// function processStoneIterativelyWithCache(stones, iterations, batchSize) {
+//   let currentStones = stones;
+
+//   for (let i = 0; i < iterations; i++) {
+//     const nextStones = [];
+
+//     for (let j = 0; j < currentStones.length; j += batchSize) {
+//       const batch = currentStones.slice(j, j + batchSize);
+//       const processedBatch = batch.flatMap((stone) =>
+//         processStoneWithCache(stone)
+//       );
+//       nextStones.push(...processedBatch);
+//     }
+
+//     currentStones = nextStones;
+
+//     console.log(`Iteration ${i + 1}, Stones Count: ${currentStones.length}`);
+//   }
+
+//   return currentStones;
+// }
+
+// processStoneIterativelyWithCache(stones, 75, 10000);
+function processStoneInChunks(stones, maxIterations, chunkSize) {
   let currentStones = stones;
-  for (let i = 0; i < iterations; i++) {
-    currentStones = currentStones.flatMap((stone) => processStone(stone));
+
+  for (let i = 0; i < maxIterations; i++) {
+    let nextStones = [];
+
+    // stones 배열을 chunkSize만큼 분할하여 처리
+    for (let j = 0; j < currentStones.length; j += chunkSize) {
+      const chunk = currentStones.slice(j, j + chunkSize);
+      const processedChunk = chunk.flatMap((stone) => processStone(stone));
+      nextStones.push(...processedChunk);
+    }
+
+    currentStones = nextStones;
+    console.log(`Iteration ${i + 1}, Stones Count: ${currentStones.length}`);
   }
+
   return currentStones;
 }
 
-const res = processStoneIteratively(stones, 25);
-console.log(res);
-console.log(res.length);
+processStoneInChunks(stones, 75, 1000);
