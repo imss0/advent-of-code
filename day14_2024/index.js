@@ -45,12 +45,20 @@ function moveTile(grid, currentX, currentY, dx, dy, width, height) {
   return { x: newX, y: newY, dx, dy };
 }
 
-for (let i = 0; i < 100; i++) {
+let iterationCount = 0;
+while (true) {
   positions = positions.map((point) => {
     const { x, y, dx, dy } = point;
-
     return moveTile(tiles, x, y, dx, dy, 101, 103);
   });
+
+
+  if (isChristmasTree(tiles)) {
+    console.log(`Christmas tree found at iteration ${iterationCount + 1}`);
+    break;
+  }
+
+  iterationCount++;
 }
 function calculateQuadrantSums(grid) {
   const quadrants = [0, 0, 0, 0];
@@ -93,3 +101,31 @@ function calculateQuadrantSums(grid) {
 const quadrantSums = calculateQuadrantSums(tiles);
 
 console.log(quadrantSums);
+
+function isChristmasTree(grid) {
+  let isTreeShape = true;
+
+  const startY = 0;
+  const startX = 50;
+
+  let currentTileCount = 1;
+  for (let i = 0; i < 5; i++) {
+    for (
+      let j = -Math.floor(currentTileCount / 2);
+      j <= Math.floor(currentTileCount / 2);
+      j++
+    ) {
+      const y = startY + i;
+      const x = startX + j;
+      if (grid[y][x] === ".") {
+        isTreeShape = false;
+        break;
+      }
+    }
+
+    if (!isTreeShape) break;
+    currentTileCount += 2;
+  }
+
+  return isTreeShape;
+}
